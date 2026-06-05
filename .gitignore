@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env.local
+.env
+
+# Next.js
+.next/
+out/
+
+# Misc
+.DS_Store
+*.log
+
+# Keep data folder structure but not the actual text files
+# (they can be large — store separately and re-ingest on new deployments)
+data/**/*.txt
+data/**/*.md
+!data/README.md
