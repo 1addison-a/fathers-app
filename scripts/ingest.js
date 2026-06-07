@@ -8,70 +8,43 @@
 // 2. Chunks them with overlap
 // 3. Generates embeddings (OpenAI text-embedding-3-small)
 // 4. Stores chunks + embeddings in Supabase
-// 5. Generates a theological overview summary and stores it
+// 5. Stores a theological overview from fathers.js
 // ============================================================
 
 import fs from "fs";
 import path from "path";
 import { createClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
-import Anthropic from "@anthropic-ai/sdk";
 import { chunkDocument } from "../lib/chunker.js";
-import { FATHERS } from "../lib/fathers.js";
+import { FATHERS, EXTENDED_FATHERS } from "../lib/fathers.js";
 
-// Load env vars (when running as a script, not via Next.js)
 import { config } from "dotenv";
 config({ path: ".env.local" });
+
+const ALL_FATHERS = { ...FATHERS, ...EXTENDED_FATHERS };
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 const DATA_DIR = path.join(process.cwd(), "data");
-const BATCH_SIZE = 20; // embed 20 chunks at a time to stay within rate limits
+const BATCH_SIZE = 20;
 
 // ── Embed a batch of texts ────────────────────────────────────
 async function embedBatch(texts) {
+  const truncated = texts.map((t) => t.slice(0, 6000));
   const response = await openai.embeddings.create({
     model: "text-embedding-3-small",
-    input: texts,
+    input: truncated,
   });
   return response.data.map((d) => d.embedding);
 }
 
-// ── Generate theological overview for a Father ────────────────
-async function generateOverview(father, docTexts) {
-  console.log(`  Generating theological overview for ${father.name}...`);
-  const sample = docTexts
-    .map((t) => t.slice(0, 3000))
-    .join("\n\n---\n\n")
-    .slice(0, 15000);
-
-  const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 800,
-    system: `You are a patristics scholar. Write a 200-300 word theological overview of ${father.name} 
-based on the sample texts provided. Cover: their hermeneutical method, key theological commitments, 
-historical context, major works, and how their thought developed over time. 
-This will be injected into every prompt to give the AI model context before it reads retrieved passages.
-Write in third person, densely informative, no preamble.`,
-    messages: [
-      {
-        role: "user",
-        content: `Sample texts from ${father.name}'s writings:\n\n${sample}`,
-      },
-    ],
-  });
-
-  return response.content[0].text;
-}
-
 // ── Ingest a single father ─────────────────────────────────────
 async function ingestFather(fatherId) {
-  const father = FATHERS[fatherId];
+  const father = ALL_FATHERS[fatherId];
   if (!father) {
     console.error(`Unknown father: ${fatherId}`);
     return;
@@ -101,28 +74,23 @@ async function ingestFather(fatherId) {
     .eq("father_id", fatherId);
   if (deleteError) console.warn("  Warning: could not delete existing chunks:", deleteError.message);
 
-  const allDocTexts = [];
   let totalChunks = 0;
 
   for (const file of files) {
     const filePath = path.join(fatherDataDir, file);
     const text = fs.readFileSync(filePath, "utf-8");
-    allDocTexts.push(text);
 
     console.log(`  Processing ${file} (${Math.round(text.length / 1000)}k chars)...`);
 
     const chunks = chunkDocument(text, file);
     console.log(`    → ${chunks.length} chunks`);
 
-    // Process in batches
     for (let i = 0; i < chunks.length; i += BATCH_SIZE) {
       const batch = chunks.slice(i, i + BATCH_SIZE);
       const texts = batch.map((c) => c.chunkText);
 
-      // Generate embeddings for this batch
       const embeddings = await embedBatch(texts);
 
-      // Insert into Supabase
       const rows = batch.map((chunk, j) => ({
         father_id: fatherId,
         source_doc: chunk.sourceDoc,
@@ -139,7 +107,6 @@ async function ingestFather(fatherId) {
         process.stdout.write(`    ✓ Inserted chunks ${i + 1}–${Math.min(i + BATCH_SIZE, chunks.length)}\r`);
       }
 
-      // Small delay to respect rate limits
       await new Promise((r) => setTimeout(r, 200));
     }
 
@@ -147,8 +114,8 @@ async function ingestFather(fatherId) {
     console.log(`    ✓ Done: ${chunks.length} chunks from ${file}`);
   }
 
-  // Generate and store theological overview
-  const overview = await generateOverview(father, allDocTexts);
+  // Store theological overview from fathers.js (no API call needed)
+  const overview = father.defaultOverview || `${father.name} (${father.era}), a ${father.tradition} Father of the Church.`;
 
   const { error: summaryError } = await supabase
     .from("father_summaries")
@@ -173,13 +140,12 @@ async function ingestFather(fatherId) {
 
 // ── Main ──────────────────────────────────────────────────────
 async function main() {
-  const targetFather = process.argv[2]; // e.g. node scripts/ingest.js augustine
+  const targetFather = process.argv[2];
 
   if (targetFather) {
     await ingestFather(targetFather);
   } else {
-    // Ingest all fathers that have data directories
-    const fatherIds = Object.keys(FATHERS).filter((id) =>
+    const fatherIds = Object.keys(ALL_FATHERS).filter((id) =>
       fs.existsSync(path.join(DATA_DIR, id))
     );
 
