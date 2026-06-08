@@ -402,7 +402,10 @@ export default function Home() {
       <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
         {showFathers && (
           <div style={{ width: 300, borderRight: `1px solid ${t.border}`, background: t.surface, overflowY: "auto", padding: "20px", flexShrink: 0, transition: "background 0.3s" }}>
-            <div style={{ fontSize: 11, fontWeight: 600, color: t.textMuted, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 20, fontFamily: "-apple-system, sans-serif" }}>Church Fathers</div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: t.textMuted, letterSpacing: "0.08em", textTransform: "uppercase", fontFamily: "-apple-system, sans-serif" }}>Church Fathers</div>
+            <button onClick={() => setShowFathers(false)} style={{ background: "none", border: "none", color: t.textMuted, cursor: "pointer", fontSize: 18, lineHeight: 1, padding: "0 4px" }}>×</button>
+          </div>
             {Object.entries(FATHERS_META).map(([id, f]) => (
               <FatherCard key={id} father={f} onTopicClick={handleTopicClick} />
             ))}
