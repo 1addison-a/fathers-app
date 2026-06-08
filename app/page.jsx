@@ -102,12 +102,6 @@ const FATHERS_META = {
   },
 };
 
-const TRADITION_META = {
-  Western:     { color: "#64748B" },
-  Eastern:     { color: "#64748B" },
-  Alexandrian: { color: "#64748B" },
-};
-
 const BOOKS = [
   "Genesis","Exodus","Leviticus","Numbers","Deuteronomy","Joshua","Judges","Ruth",
   "1 Samuel","2 Samuel","1 Kings","2 Kings","Ezra","Nehemiah","Esther","Job",
@@ -117,6 +111,29 @@ const BOOKS = [
   "Galatians","Ephesians","Philippians","Colossians","1 Thessalonians","2 Timothy",
   "Titus","Hebrews","James","1 Peter","2 Peter","1 John","Jude","Revelation",
 ];
+
+const themes = {
+  light: {
+    bg: "#FAFAF8", surface: "#fff", text: "#0F172A", textSecondary: "#64748B",
+    textMuted: "#94A3B8", textFaint: "#CBD5E1", border: "#E2E8F0", borderLight: "#F1F5F9",
+    hoverBg: "#F8FAFC", hoverBg2: "#F1F5F9", inputBg: "#fff",
+    questionBg: "#F1F5F9", questionBorder: "#E2E8F0",
+    errorBg: "#FEF9F0", errorBorder: "#FDE68A", errorText: "#92400E",
+    badgeBg: "#F0FDF4", badgeText: "#15803D", badgeBorder: "#BBF7D0",
+    btnBg: "#0F172A", btnText: "#fff", btnDisabledBg: "#F1F5F9", btnDisabledText: "#CBD5E1",
+    shimmer1: "#E2E8F0", shimmer2: "#F8FAFC", responseText: "#1E293B",
+  },
+  dark: {
+    bg: "#0D0B08", surface: "#161210", text: "#E8DFC8", textSecondary: "#8A7E6A",
+    textMuted: "#5A4E38", textFaint: "#3A2E1E", border: "#2A2015", borderLight: "#1A1510",
+    hoverBg: "#1A1510", hoverBg2: "#2A2015", inputBg: "#141008",
+    questionBg: "#141008", questionBorder: "#2A2015",
+    errorBg: "#1A1008", errorBorder: "#4A3E1E", errorText: "#C9A96E",
+    badgeBg: "#081510", badgeText: "#4A8A5E", badgeBorder: "#1A3A28",
+    btnBg: "#C9A96E", btnText: "#0D0B08", btnDisabledBg: "#141008", btnDisabledText: "#3A2E1E",
+    shimmer1: "#2A2015", shimmer2: "#1A1510", responseText: "#B8AF98",
+  },
+};
 
 function CitedResponse({ text }) {
   const parts = [];
@@ -135,8 +152,8 @@ function CitedResponse({ text }) {
         p.type === "text"
           ? <span key={i} style={{ whiteSpace: "pre-wrap" }}>{p.content}</span>
           : <span key={i} title={`Source: ${p.content}`} style={{
-              background: "#F1F5F9", border: "1px solid #CBD5E1", borderRadius: 3,
-              fontSize: 11, padding: "1px 6px", margin: "0 2px", color: "#475569",
+              background: "var(--hover-bg2)", border: "1px solid var(--border)", borderRadius: 3,
+              fontSize: 11, padding: "1px 6px", margin: "0 2px", color: "var(--text-secondary)",
               verticalAlign: "middle", cursor: "default", fontFamily: "inherit",
             }}>
               {p.content.length > 35 ? p.content.slice(0, 35) + "…" : p.content}
@@ -146,42 +163,88 @@ function CitedResponse({ text }) {
   );
 }
 
-function FatherCard({ fatherId, father, onTopicClick }) {
+function FatherCard({ father, onTopicClick }) {
   const [expanded, setExpanded] = useState(false);
   return (
-    <div style={{ borderBottom: "1px solid #E2E8F0", paddingBottom: 20, marginBottom: 20 }}>
+    <div style={{ borderBottom: "1px solid var(--border)", paddingBottom: 20, marginBottom: 20 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
         <div>
-          <div style={{ fontSize: 15, fontWeight: 600, color: "#0F172A", marginBottom: 2, fontFamily: "Georgia, 'Times New Roman', serif" }}>{father.name}</div>
-          <div style={{ fontSize: 12, color: "#94A3B8", letterSpacing: "0.02em" }}>{father.era} · {father.tradition}</div>
+          <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 2, fontFamily: "Georgia, 'Times New Roman', serif" }}>{father.name}</div>
+          <div style={{ fontSize: 12, color: "var(--text-muted)", letterSpacing: "0.02em" }}>{father.era} · {father.tradition}</div>
         </div>
         <button onClick={() => setExpanded(e => !e)} style={{
-          background: "none", border: "1px solid #E2E8F0", borderRadius: 6,
-          padding: "4px 10px", fontSize: 12, color: "#64748B", cursor: "pointer",
+          background: "none", border: "1px solid var(--border)", borderRadius: 6,
+          padding: "4px 10px", fontSize: 12, color: "var(--text-secondary)", cursor: "pointer",
           fontFamily: "inherit", flexShrink: 0, marginLeft: 12,
         }}>
           {expanded ? "Less" : "Topics"}
         </button>
       </div>
-      <p style={{ fontSize: 13, color: "#64748B", lineHeight: 1.65, margin: "0 0 10px", fontStyle: "italic" }}>
+      <p style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.65, margin: "0 0 10px", fontStyle: "italic" }}>
         {father.notableFor}
       </p>
       {expanded && (
         <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8 }}>
           {father.topics.map(topic => (
             <button key={topic.label} onClick={() => onTopicClick(topic.query)} style={{
-              background: "#F8FAFC", border: "1px solid #E2E8F0", borderRadius: 5,
-              padding: "5px 11px", fontSize: 12, color: "#334155", cursor: "pointer",
+              background: "var(--hover-bg)", border: "1px solid var(--border)", borderRadius: 5,
+              padding: "5px 11px", fontSize: 12, color: "var(--text)", cursor: "pointer",
               fontFamily: "inherit", transition: "all 0.12s",
-            }}
-              onMouseEnter={e => { e.target.style.background = "#F1F5F9"; e.target.style.borderColor = "#CBD5E1"; }}
-              onMouseLeave={e => { e.target.style.background = "#F8FAFC"; e.target.style.borderColor = "#E2E8F0"; }}
-            >
+            }}>
               {topic.label}
             </button>
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+function SkeletonLine({ width }) {
+  return <div className="shimmer" style={{ width, height: 14, borderRadius: 3 }} />;
+}
+
+function LoadingSkeleton({ message }) {
+  return (
+    <div style={{ marginBottom: 36 }}>
+      {/* Routing line skeleton */}
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 18 }}>
+        <div style={{ display: "flex", gap: 3 }}>
+          {[0,1,2].map(i => (
+            <div key={i} style={{ width: 5, height: 5, borderRadius: "50%", background: "var(--text-faint)", animation: `fade 1.2s ease-in-out ${i * 0.2}s infinite` }} />
+          ))}
+        </div>
+        <span style={{ fontSize: 13, color: "var(--text-muted)", fontFamily: "-apple-system, sans-serif" }}>{message}</span>
+      </div>
+
+      {/* Skeleton cards */}
+      {[0, 1].map(card => (
+        <div key={card} style={{ marginBottom: 24, paddingBottom: 24, borderBottom: "1px solid var(--border-light)" }}>
+          {/* Header */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
+            <div>
+              <div className="shimmer" style={{ width: 180, height: 17, borderRadius: 4, marginBottom: 6 }} />
+              <div className="shimmer" style={{ width: 130, height: 11, borderRadius: 3 }} />
+            </div>
+            <div className="shimmer" style={{ width: 72, height: 20, borderRadius: 4 }} />
+          </div>
+          {/* Body lines */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 6 }}>
+            <SkeletonLine width="100%" />
+            <SkeletonLine width="97%" />
+            <SkeletonLine width="90%" />
+            <SkeletonLine width="94%" />
+            <SkeletonLine width="85%" />
+            <SkeletonLine width="70%" />
+          </div>
+          {/* Reference chips */}
+          <div style={{ display: "flex", gap: 6, marginTop: 16 }}>
+            <div className="shimmer" style={{ width: 75, height: 22, borderRadius: 4 }} />
+            <div className="shimmer" style={{ width: 60, height: 22, borderRadius: 4 }} />
+            <div className="shimmer" style={{ width: 85, height: 22, borderRadius: 4 }} />
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
@@ -202,8 +265,18 @@ export default function Home() {
   const [showSessions, setShowSessions] = useState(false);
   const [showFathers, setShowFathers] = useState(false);
   const [currentSessionId, setCurrentSessionId] = useState(null);
+  const [darkMode, setDarkMode] = useState(false);
   const chatEndRef = useRef();
   const textareaRef = useRef();
+
+  const t = darkMode ? themes.dark : themes.light;
+
+  useEffect(() => {
+    try { const saved = localStorage.getItem("vof_dark_mode"); if (saved === "true") setDarkMode(true); } catch {}
+  }, []);
+  useEffect(() => {
+    try { localStorage.setItem("vof_dark_mode", darkMode.toString()); } catch {}
+  }, [darkMode]);
 
   const [sessions, setSessions] = useState(() => {
     try { return JSON.parse(localStorage.getItem("vof_sessions_v4") || "[]"); } catch { return []; }
@@ -225,17 +298,14 @@ export default function Home() {
     setCurrentSessionId(s.id); setSessionName(s.name); setShowSessions(false);
     setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
   };
-
   const newSession = () => {
     setResponses([]); setConversations({}); setCurrentSessionId(null);
     setSessionName("New Session"); setShowSessions(false);
   };
-
   const handleTopicClick = (query) => {
     setQuestion(query); setInputMode("question"); setShowFathers(false);
     setTimeout(() => textareaRef.current?.focus(), 50);
   };
-
   const buildQuery = () => {
     if (inputMode === "passage") {
       const ref = `${passageBook} ${passageChapter}:${passageVerse}`;
@@ -243,7 +313,6 @@ export default function Home() {
     }
     return question;
   };
-
   const buildDisplayQ = () => {
     if (inputMode === "passage")
       return `${passageBook} ${passageChapter}:${passageVerse}${passageQ ? ` — ${passageQ}` : ""}`;
@@ -280,44 +349,48 @@ export default function Home() {
     setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
   };
 
-  const activeFathers = Object.entries(conversations).filter(([, h]) => h.length > 0).map(([id]) => id);
-
   return (
-    <div style={{ height: "100vh", background: "#FAFAF8", color: "#0F172A", fontFamily: "Georgia, 'Times New Roman', serif", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+    <div style={{
+      "--text-secondary": t.textSecondary, "--text-muted": t.textMuted, "--text-faint": t.textFaint,
+      "--text": t.text, "--border": t.border, "--border-light": t.borderLight,
+      "--hover-bg": t.hoverBg, "--hover-bg2": t.hoverBg2, "--shimmer1": t.shimmer1, "--shimmer2": t.shimmer2,
+      height: "100vh", background: t.bg, color: t.text,
+      fontFamily: "Georgia, 'Times New Roman', serif",
+      display: "flex", flexDirection: "column", overflow: "hidden",
+      transition: "background 0.3s, color 0.3s",
+    }}>
 
       {/* Header */}
-      <header style={{ background: "#fff", borderBottom: "1px solid #E2E8F0", padding: "0 28px", height: 54, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
+      <header style={{ background: t.surface, borderBottom: `1px solid ${t.border}`, padding: "0 28px", height: 54, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, transition: "background 0.3s" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <span style={{ fontSize: 18, color: "#94A3B8" }}>✝</span>
+          <span style={{ fontSize: 18, color: t.textMuted }}>✝</span>
           {editingName
             ? <input autoFocus value={sessionName} onChange={e => setSessionName(e.target.value)} onBlur={() => setEditingName(false)} onKeyDown={e => e.key === "Enter" && setEditingName(false)}
-                style={{ border: "none", borderBottom: "1px solid #94A3B8", outline: "none", fontSize: 15, fontWeight: 600, background: "transparent", color: "#0F172A", fontFamily: "Georgia, serif", width: 200 }} />
-            : <span onClick={() => setEditingName(true)} style={{ fontSize: 15, fontWeight: 600, color: "#0F172A", cursor: "text", fontFamily: "Georgia, serif" }}>{sessionName}</span>
+                style={{ border: "none", borderBottom: `1px solid ${t.textMuted}`, outline: "none", fontSize: 15, fontWeight: 600, background: "transparent", color: t.text, fontFamily: "Georgia, serif", width: 200 }} />
+            : <span onClick={() => setEditingName(true)} style={{ fontSize: 15, fontWeight: 600, color: t.text, cursor: "text", fontFamily: "Georgia, serif" }}>{sessionName}</span>
           }
         </div>
-
         <div style={{ display: "flex", gap: 6 }}>
-          <button onClick={() => setShowFathers(s => !s)} style={{ background: showFathers ? "#F1F5F9" : "none", border: "1px solid #E2E8F0", borderRadius: 6, padding: "5px 12px", fontSize: 12, color: "#475569", cursor: "pointer", fontFamily: "inherit" }}>
-            The Fathers
+          <button onClick={() => setDarkMode(d => !d)} title={darkMode ? "Light mode" : "Dark mode"} style={{ background: "none", border: `1px solid ${t.border}`, borderRadius: 6, padding: "5px 10px", fontSize: 15, color: t.textSecondary, cursor: "pointer", fontFamily: "inherit", lineHeight: 1, transition: "all 0.2s" }}>
+            {darkMode ? "☀" : "☽"}
           </button>
-          <button onClick={newSession} style={{ background: "none", border: "1px solid #E2E8F0", borderRadius: 6, padding: "5px 12px", fontSize: 12, color: "#475569", cursor: "pointer", fontFamily: "inherit" }}>
-            New
-          </button>
+          <button onClick={() => setShowFathers(s => !s)} style={{ background: showFathers ? t.hoverBg2 : "none", border: `1px solid ${t.border}`, borderRadius: 6, padding: "5px 12px", fontSize: 12, color: t.textSecondary, cursor: "pointer", fontFamily: "inherit" }}>The Fathers</button>
+          <button onClick={newSession} style={{ background: "none", border: `1px solid ${t.border}`, borderRadius: 6, padding: "5px 12px", fontSize: 12, color: t.textSecondary, cursor: "pointer", fontFamily: "inherit" }}>New</button>
           <div style={{ position: "relative" }}>
-            <button onClick={() => setShowSessions(s => !s)} style={{ background: showSessions ? "#F1F5F9" : "none", border: "1px solid #E2E8F0", borderRadius: 6, padding: "5px 12px", fontSize: 12, color: "#475569", cursor: "pointer", fontFamily: "inherit" }}>
+            <button onClick={() => setShowSessions(s => !s)} style={{ background: showSessions ? t.hoverBg2 : "none", border: `1px solid ${t.border}`, borderRadius: 6, padding: "5px 12px", fontSize: 12, color: t.textSecondary, cursor: "pointer", fontFamily: "inherit" }}>
               Sessions {sessions.length > 0 ? `(${sessions.length})` : ""}
             </button>
             {showSessions && (
-              <div style={{ position: "absolute", top: 36, right: 0, background: "#fff", border: "1px solid #E2E8F0", borderRadius: 8, boxShadow: "0 4px 20px rgba(0,0,0,0.08)", width: 260, zIndex: 50, maxHeight: 340, overflowY: "auto" }}>
-                <div style={{ padding: "10px 14px 6px", fontSize: 11, fontWeight: 600, color: "#94A3B8", letterSpacing: "0.06em", textTransform: "uppercase", fontFamily: "-apple-system, sans-serif" }}>Saved sessions</div>
-                {sessions.length === 0 && <div style={{ padding: "10px 14px 14px", fontSize: 13, color: "#94A3B8", fontFamily: "-apple-system, sans-serif" }}>No sessions yet.</div>}
+              <div style={{ position: "absolute", top: 36, right: 0, background: t.surface, border: `1px solid ${t.border}`, borderRadius: 8, boxShadow: "0 4px 20px rgba(0,0,0,0.15)", width: 260, zIndex: 50, maxHeight: 340, overflowY: "auto" }}>
+                <div style={{ padding: "10px 14px 6px", fontSize: 11, fontWeight: 600, color: t.textMuted, letterSpacing: "0.06em", textTransform: "uppercase", fontFamily: "-apple-system, sans-serif" }}>Saved sessions</div>
+                {sessions.length === 0 && <div style={{ padding: "10px 14px 14px", fontSize: 13, color: t.textMuted, fontFamily: "-apple-system, sans-serif" }}>No sessions yet.</div>}
                 {sessions.map(s => (
-                  <div key={s.id} onClick={() => loadSession(s)} style={{ padding: "9px 14px", cursor: "pointer", borderTop: "1px solid #F1F5F9", background: currentSessionId === s.id ? "#F8FAFC" : "transparent", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div key={s.id} onClick={() => loadSession(s)} style={{ padding: "9px 14px", cursor: "pointer", borderTop: `1px solid ${t.borderLight}`, background: currentSessionId === s.id ? t.hoverBg : "transparent", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div>
-                      <div style={{ fontSize: 13, color: "#0F172A", fontFamily: "Georgia, serif" }}>{s.name}</div>
-                      <div style={{ fontSize: 11, color: "#94A3B8", marginTop: 1, fontFamily: "-apple-system, sans-serif" }}>{new Date(s.updatedAt).toLocaleDateString()} · {(s.responses || []).filter(r => r.type === "answers").length} exchanges</div>
+                      <div style={{ fontSize: 13, color: t.text, fontFamily: "Georgia, serif" }}>{s.name}</div>
+                      <div style={{ fontSize: 11, color: t.textMuted, marginTop: 1, fontFamily: "-apple-system, sans-serif" }}>{new Date(s.updatedAt).toLocaleDateString()} · {(s.responses || []).filter(r => r.type === "answers").length} exchanges</div>
                     </div>
-                    <button onClick={e => { e.stopPropagation(); setSessions(prev => { const u = prev.filter(x => x.id !== s.id); localStorage.setItem("vof_sessions_v4", JSON.stringify(u)); return u; }); }} style={{ background: "none", border: "none", color: "#CBD5E1", cursor: "pointer", fontSize: 18 }}>×</button>
+                    <button onClick={e => { e.stopPropagation(); setSessions(prev => { const u = prev.filter(x => x.id !== s.id); localStorage.setItem("vof_sessions_v4", JSON.stringify(u)); return u; }); }} style={{ background: "none", border: "none", color: t.textFaint, cursor: "pointer", fontSize: 18 }}>×</button>
                   </div>
                 ))}
               </div>
@@ -327,28 +400,24 @@ export default function Home() {
       </header>
 
       <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
-
-        {/* Fathers sidebar */}
         {showFathers && (
-          <div style={{ width: 300, borderRight: "1px solid #E2E8F0", background: "#fff", overflowY: "auto", padding: "20px 20px", flexShrink: 0 }}>
-            <div style={{ fontSize: 11, fontWeight: 600, color: "#94A3B8", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 20, fontFamily: "-apple-system, sans-serif" }}>Church Fathers</div>
+          <div style={{ width: 300, borderRight: `1px solid ${t.border}`, background: t.surface, overflowY: "auto", padding: "20px", flexShrink: 0, transition: "background 0.3s" }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: t.textMuted, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 20, fontFamily: "-apple-system, sans-serif" }}>Church Fathers</div>
             {Object.entries(FATHERS_META).map(([id, f]) => (
-              <FatherCard key={id} fatherId={id} father={f} onTopicClick={handleTopicClick} />
+              <FatherCard key={id} father={f} onTopicClick={handleTopicClick} />
             ))}
           </div>
         )}
 
-        {/* Main content */}
         <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
           <div style={{ flex: 1, overflowY: "auto", padding: "32px 40px" }}>
             <div style={{ maxWidth: 720, margin: "0 auto" }}>
 
-              {/* Empty state */}
               {responses.length === 0 && (
                 <div style={{ textAlign: "center", paddingTop: 60 }}>
-                  <div style={{ fontSize: 28, color: "#CBD5E1", marginBottom: 20 }}>✝</div>
-                  <h1 style={{ fontSize: 24, fontWeight: 600, color: "#0F172A", margin: "0 0 10px", letterSpacing: "-0.3px" }}>Voices of the Fathers</h1>
-                  <p style={{ fontSize: 15, color: "#64748B", lineHeight: 1.7, maxWidth: 480, margin: "0 auto 32px" }}>
+                  <div style={{ fontSize: 28, color: t.textFaint, marginBottom: 20 }}>✝</div>
+                  <h1 style={{ fontSize: 24, fontWeight: 600, color: t.text, margin: "0 0 10px", letterSpacing: "-0.3px" }}>Voices of the Fathers</h1>
+                  <p style={{ fontSize: 15, color: t.textSecondary, lineHeight: 1.7, maxWidth: 480, margin: "0 auto 32px" }}>
                     Ask a theological question or select a scripture passage. The agent searches all patristic writings and surfaces the Fathers whose texts speak directly to your question.
                   </p>
                   <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
@@ -361,118 +430,97 @@ export default function Home() {
                       { q: "How do you interpret the Sermon on the Mount?", label: "Sermon on the Mount" },
                     ].map(item => (
                       <button key={item.label} onClick={() => { setQuestion(item.q); setTimeout(() => textareaRef.current?.focus(), 50); }} style={{
-                        background: "#fff", border: "1px solid #E2E8F0", borderRadius: 20, padding: "7px 16px",
-                        fontSize: 13, color: "#475569", cursor: "pointer", fontFamily: "Georgia, serif",
-                        transition: "all 0.12s",
-                      }}
-                        onMouseEnter={e => { e.target.style.background = "#F8FAFC"; e.target.style.borderColor = "#CBD5E1"; }}
-                        onMouseLeave={e => { e.target.style.background = "#fff"; e.target.style.borderColor = "#E2E8F0"; }}
-                      >
+                        background: t.surface, border: `1px solid ${t.border}`, borderRadius: 20, padding: "7px 16px",
+                        fontSize: 13, color: t.textSecondary, cursor: "pointer", fontFamily: "Georgia, serif", transition: "all 0.12s",
+                      }}>
                         {item.label}
                       </button>
                     ))}
                   </div>
-                  <p style={{ fontSize: 12, color: "#CBD5E1", marginTop: 24, fontFamily: "-apple-system, sans-serif" }}>
+                  <p style={{ fontSize: 12, color: t.textFaint, marginTop: 24, fontFamily: "-apple-system, sans-serif" }}>
                     Open "The Fathers" in the header to browse topics by Church Father
                   </p>
                 </div>
               )}
 
-              {/* Messages */}
               {responses.map((entry, i) => {
                 if (entry.type === "question") return (
-                  <div key={i} style={{ marginBottom: 28 }}>
-                    <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                      <div style={{ background: "#F1F5F9", borderRadius: 12, borderBottomRightRadius: 3, padding: "10px 16px", maxWidth: "72%", border: "1px solid #E2E8F0" }}>
-                        {entry.isPassage && <div style={{ fontSize: 10, fontWeight: 600, color: "#94A3B8", marginBottom: 3, letterSpacing: "0.06em", textTransform: "uppercase", fontFamily: "-apple-system, sans-serif" }}>Passage</div>}
-                        <div style={{ fontSize: 14, color: "#0F172A", lineHeight: 1.6 }}>{entry.text}</div>
-                      </div>
+                  <div key={i} style={{ marginBottom: 28, display: "flex", justifyContent: "flex-end" }}>
+                    <div style={{ background: t.questionBg, borderRadius: 12, borderBottomRightRadius: 3, padding: "10px 16px", maxWidth: "72%", border: `1px solid ${t.questionBorder}` }}>
+                      {entry.isPassage && <div style={{ fontSize: 10, fontWeight: 600, color: t.textMuted, marginBottom: 3, letterSpacing: "0.06em", textTransform: "uppercase", fontFamily: "-apple-system, sans-serif" }}>Passage</div>}
+                      <div style={{ fontSize: 14, color: t.text, lineHeight: 1.6 }}>{entry.text}</div>
                     </div>
                   </div>
                 );
-
                 if (entry.type === "error" || entry.type === "noMatch") return (
-                  <div key={i} style={{ marginBottom: 20, padding: "12px 16px", background: "#FEF9F0", border: "1px solid #FDE68A", borderRadius: 8 }}>
-                    <div style={{ fontSize: 13, color: "#92400E", fontFamily: "-apple-system, sans-serif" }}>{entry.text}</div>
+                  <div key={i} style={{ marginBottom: 20, padding: "12px 16px", background: t.errorBg, border: `1px solid ${t.errorBorder}`, borderRadius: 8 }}>
+                    <div style={{ fontSize: 13, color: t.errorText, fontFamily: "-apple-system, sans-serif" }}>{entry.text}</div>
                   </div>
                 );
-
                 if (entry.type === "answers") {
                   const { answers, sharedRefs } = entry;
                   return (
                     <div key={i} style={{ marginBottom: 36 }}>
-                      {/* Routing line */}
                       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 18, flexWrap: "wrap" }}>
-                        <span style={{ fontSize: 11, color: "#CBD5E1", fontFamily: "-apple-system, sans-serif", letterSpacing: "0.04em" }}>Responding:</span>
-                        {answers.map(({ fatherId, topScore }) => {
+                        <span style={{ fontSize: 11, color: t.textFaint, fontFamily: "-apple-system, sans-serif", letterSpacing: "0.04em" }}>Responding:</span>
+                        {answers.map(({ fatherId, topScore }, idx) => {
                           const f = FATHERS_META[fatherId];
                           return (
-                            <span key={fatherId} style={{ fontSize: 12, color: "#64748B", fontFamily: "-apple-system, sans-serif" }}>
+                            <span key={fatherId} style={{ fontSize: 12, color: t.textSecondary, fontFamily: "-apple-system, sans-serif" }}>
                               {f?.shortName || fatherId}
-                              <span style={{ color: "#CBD5E1", marginLeft: 3 }}>{Math.round(topScore * 100)}%</span>
-                              {answers.indexOf(answers.find(a => a.fatherId === fatherId)) < answers.length - 1 ? <span style={{ color: "#E2E8F0", marginLeft: 3 }}>·</span> : ""}
+                              <span style={{ color: t.textFaint, marginLeft: 3 }}>{Math.round(topScore * 100)}%</span>
+                              {idx < answers.length - 1 ? <span style={{ color: t.border, marginLeft: 3 }}>·</span> : ""}
                             </span>
                           );
                         })}
                       </div>
-
-                      {/* Cross-reference convergence */}
                       {sharedRefs?.length > 0 && (
-                        <div style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", borderRadius: 8, padding: "10px 14px", marginBottom: 20 }}>
-                          <div style={{ fontSize: 11, fontWeight: 600, color: "#94A3B8", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 7, fontFamily: "-apple-system, sans-serif" }}>Shared references</div>
+                        <div style={{ background: t.hoverBg, border: `1px solid ${t.border}`, borderRadius: 8, padding: "10px 14px", marginBottom: 20 }}>
+                          <div style={{ fontSize: 11, fontWeight: 600, color: t.textMuted, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 7, fontFamily: "-apple-system, sans-serif" }}>Shared references</div>
                           <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                             {sharedRefs.map(({ ref, ids }) => (
-                              <div key={ref} style={{ display: "flex", alignItems: "center", gap: 5, background: "#fff", border: "1px solid #E2E8F0", borderRadius: 5, padding: "3px 10px" }}>
-                                <span style={{ fontSize: 12, color: "#0F172A", fontFamily: "Georgia, serif" }}>{ref}</span>
-                                <span style={{ fontSize: 11, color: "#94A3B8", fontFamily: "-apple-system, sans-serif" }}>{ids.map(id => FATHERS_META[id]?.shortName || id).join(", ")}</span>
+                              <div key={ref} style={{ display: "flex", alignItems: "center", gap: 5, background: t.surface, border: `1px solid ${t.border}`, borderRadius: 5, padding: "3px 10px" }}>
+                                <span style={{ fontSize: 12, color: t.text, fontFamily: "Georgia, serif" }}>{ref}</span>
+                                <span style={{ fontSize: 11, color: t.textMuted, fontFamily: "-apple-system, sans-serif" }}>{ids.map(id => FATHERS_META[id]?.shortName || id).join(", ")}</span>
                               </div>
                             ))}
                           </div>
                         </div>
                       )}
-
-                      {/* Father responses */}
                       {answers.map(({ fatherId, response, crossrefs, topScore, hasContext, sourceChunks }) => {
                         const f = FATHERS_META[fatherId];
                         if (!f) return null;
                         const turns = Math.floor((conversations[fatherId] || []).length / 2);
                         return (
-                          <div key={fatherId} style={{ marginBottom: 24, paddingBottom: 24, borderBottom: "1px solid #F1F5F9" }}>
-                            {/* Father header */}
+                          <div key={fatherId} style={{ marginBottom: 24, paddingBottom: 24, borderBottom: `1px solid ${t.borderLight}` }}>
                             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
                               <div>
-                                <div style={{ fontSize: 15, fontWeight: 600, color: "#0F172A", fontFamily: "Georgia, serif" }}>{f.name}</div>
-                                <div style={{ fontSize: 11, color: "#94A3B8", marginTop: 2, fontFamily: "-apple-system, sans-serif" }}>
+                                <div style={{ fontSize: 15, fontWeight: 600, color: t.text, fontFamily: "Georgia, serif" }}>{f.name}</div>
+                                <div style={{ fontSize: 11, color: t.textMuted, marginTop: 2, fontFamily: "-apple-system, sans-serif" }}>
                                   {f.era} · {f.tradition}
                                   {turns > 0 && <span style={{ marginLeft: 6 }}>· {turns} turn{turns !== 1 ? "s" : ""}</span>}
                                 </div>
                               </div>
                               <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
-                                {hasContext && <span style={{ fontSize: 10, background: "#F0FDF4", color: "#15803D", border: "1px solid #BBF7D0", borderRadius: 4, padding: "1px 7px", fontFamily: "-apple-system, sans-serif", fontWeight: 500 }}>from texts</span>}
-                                <span style={{ fontSize: 11, color: "#94A3B8", fontFamily: "-apple-system, sans-serif" }}>{Math.round(topScore * 100)}% match</span>
+                                {hasContext && <span style={{ fontSize: 10, background: t.badgeBg, color: t.badgeText, border: `1px solid ${t.badgeBorder}`, borderRadius: 4, padding: "1px 7px", fontFamily: "-apple-system, sans-serif", fontWeight: 500 }}>from texts</span>}
+                                <span style={{ fontSize: 11, color: t.textMuted, fontFamily: "-apple-system, sans-serif" }}>{Math.round(topScore * 100)}% match</span>
                               </div>
                             </div>
-
-                            {/* Response text */}
-                            <div style={{ fontSize: 15, lineHeight: 1.85, color: "#1E293B" }}>
+                            <div style={{ fontSize: 15, lineHeight: 1.85, color: t.responseText }}>
                               <CitedResponse text={response} />
                             </div>
-
-                            {/* Scripture refs */}
                             {crossrefs?.length > 0 && (
                               <div style={{ marginTop: 14, display: "flex", flexWrap: "wrap", gap: 5, alignItems: "center" }}>
-                                <span style={{ fontSize: 11, color: "#CBD5E1", fontFamily: "-apple-system, sans-serif" }}>References:</span>
+                                <span style={{ fontSize: 11, color: t.textFaint, fontFamily: "-apple-system, sans-serif" }}>References:</span>
                                 {crossrefs.map(ref => (
-                                  <span key={ref} style={{ fontSize: 12, padding: "2px 8px", background: "#F8FAFC", border: "1px solid #E2E8F0", color: "#475569", borderRadius: 4, fontFamily: "Georgia, serif" }}>{ref}</span>
+                                  <span key={ref} style={{ fontSize: 12, padding: "2px 8px", background: t.hoverBg, border: `1px solid ${t.border}`, color: t.textSecondary, borderRadius: 4, fontFamily: "Georgia, serif" }}>{ref}</span>
                                 ))}
                               </div>
                             )}
-
-                            {/* Source docs */}
                             {sourceChunks?.length > 0 && (
                               <div style={{ marginTop: 8, display: "flex", flexWrap: "wrap", gap: 4 }}>
                                 {[...new Set(sourceChunks.map(c => c.sourceDoc))].map(doc => (
-                                  <span key={doc} style={{ fontSize: 10, color: "#94A3B8", fontFamily: "-apple-system, sans-serif" }}>📄 {doc}</span>
+                                  <span key={doc} style={{ fontSize: 10, color: t.textMuted, fontFamily: "-apple-system, sans-serif" }}>📄 {doc}</span>
                                 ))}
                               </div>
                             )}
@@ -485,46 +533,37 @@ export default function Home() {
                 return null;
               })}
 
-              {loading && (
-                <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0 20px", color: "#94A3B8" }}>
-                  <div style={{ display: "flex", gap: 3 }}>
-                    {[0,1,2].map(i => <div key={i} style={{ width: 5, height: 5, borderRadius: "50%", background: "#CBD5E1", animation: `fade 1.2s ease-in-out ${i * 0.2}s infinite` }} />)}
-                  </div>
-                  <span style={{ fontSize: 13, fontFamily: "-apple-system, sans-serif" }}>{loadingMsg}</span>
-                </div>
-              )}
+              {loading && <LoadingSkeleton message={loadingMsg} />}
               <div ref={chatEndRef} />
             </div>
           </div>
 
           {/* Input */}
-          <div style={{ background: "#fff", borderTop: "1px solid #E2E8F0", padding: "14px 28px", flexShrink: 0 }}>
+          <div style={{ background: t.surface, borderTop: `1px solid ${t.border}`, padding: "14px 28px", flexShrink: 0, transition: "background 0.3s" }}>
             <div style={{ maxWidth: 720, margin: "0 auto" }}>
-              {/* Mode tabs */}
               <div style={{ display: "flex", gap: 0, marginBottom: 10, width: "fit-content" }}>
                 {[["question", "Question"], ["passage", "Passage"]].map(([mode, label]) => (
                   <button key={mode} onClick={() => setInputMode(mode)} style={{
                     padding: "4px 14px", fontSize: 12, background: "none", border: "none",
-                    borderBottom: inputMode === mode ? "2px solid #0F172A" : "2px solid transparent",
-                    color: inputMode === mode ? "#0F172A" : "#94A3B8", cursor: "pointer",
+                    borderBottom: inputMode === mode ? `2px solid ${t.text}` : "2px solid transparent",
+                    color: inputMode === mode ? t.text : t.textMuted, cursor: "pointer",
                     fontFamily: "inherit", transition: "all 0.12s", fontWeight: inputMode === mode ? 600 : 400,
                   }}>{label}</button>
                 ))}
               </div>
-
               {inputMode === "passage" ? (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                    <select value={passageBook} onChange={e => setPassageBook(e.target.value)} style={{ flex: 2, border: "1px solid #E2E8F0", borderRadius: 7, padding: "9px 12px", fontSize: 13, fontFamily: "Georgia, serif", color: "#0F172A", background: "#fff", outline: "none" }}>
+                    <select value={passageBook} onChange={e => setPassageBook(e.target.value)} style={{ flex: 2, border: `1px solid ${t.border}`, borderRadius: 7, padding: "9px 12px", fontSize: 13, fontFamily: "Georgia, serif", color: t.text, background: t.inputBg, outline: "none" }}>
                       {BOOKS.map(b => <option key={b}>{b}</option>)}
                     </select>
-                    <input value={passageChapter} onChange={e => setPassageChapter(e.target.value)} placeholder="Ch" style={{ width: 60, border: "1px solid #E2E8F0", borderRadius: 7, padding: "9px 10px", fontSize: 13, fontFamily: "Georgia, serif", color: "#0F172A", outline: "none", textAlign: "center" }} />
-                    <span style={{ color: "#CBD5E1" }}>:</span>
-                    <input value={passageVerse} onChange={e => setPassageVerse(e.target.value)} placeholder="V" style={{ width: 60, border: "1px solid #E2E8F0", borderRadius: 7, padding: "9px 10px", fontSize: 13, fontFamily: "Georgia, serif", color: "#0F172A", outline: "none", textAlign: "center" }} />
+                    <input value={passageChapter} onChange={e => setPassageChapter(e.target.value)} placeholder="Ch" style={{ width: 60, border: `1px solid ${t.border}`, borderRadius: 7, padding: "9px 10px", fontSize: 13, fontFamily: "Georgia, serif", color: t.text, background: t.inputBg, outline: "none", textAlign: "center" }} />
+                    <span style={{ color: t.textFaint }}>:</span>
+                    <input value={passageVerse} onChange={e => setPassageVerse(e.target.value)} placeholder="V" style={{ width: 60, border: `1px solid ${t.border}`, borderRadius: 7, padding: "9px 10px", fontSize: 13, fontFamily: "Georgia, serif", color: t.text, background: t.inputBg, outline: "none", textAlign: "center" }} />
                   </div>
                   <div style={{ display: "flex", gap: 8 }}>
-                    <input value={passageQ} onChange={e => setPassageQ(e.target.value)} onKeyDown={e => e.key === "Enter" && ask()} placeholder="Specific question about this passage (optional)" disabled={loading} style={{ flex: 1, border: "1px solid #E2E8F0", borderRadius: 7, padding: "9px 14px", fontSize: 13, fontFamily: "Georgia, serif", color: "#0F172A", outline: "none" }} />
-                    <AskBtn onClick={ask} disabled={loading} />
+                    <input value={passageQ} onChange={e => setPassageQ(e.target.value)} onKeyDown={e => e.key === "Enter" && ask()} placeholder="Specific question about this passage (optional)" disabled={loading} style={{ flex: 1, border: `1px solid ${t.border}`, borderRadius: 7, padding: "9px 14px", fontSize: 13, fontFamily: "Georgia, serif", color: t.text, background: t.inputBg, outline: "none" }} />
+                    <AskBtn onClick={ask} disabled={loading} t={t} />
                   </div>
                 </div>
               ) : (
@@ -533,8 +572,8 @@ export default function Home() {
                     onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); ask(); } }}
                     placeholder="Ask a theological question…"
                     disabled={loading} rows={2}
-                    style={{ flex: 1, border: "1px solid #E2E8F0", borderRadius: 7, padding: "10px 14px", fontSize: 14, fontFamily: "Georgia, serif", color: "#0F172A", resize: "none", lineHeight: 1.6, outline: "none", background: "#fff" }} />
-                  <AskBtn onClick={ask} disabled={!question.trim() || loading} />
+                    style={{ flex: 1, border: `1px solid ${t.border}`, borderRadius: 7, padding: "10px 14px", fontSize: 14, fontFamily: "Georgia, serif", color: t.text, resize: "none", lineHeight: 1.6, outline: "none", background: t.inputBg, transition: "background 0.3s, color 0.3s" }} />
+                  <AskBtn onClick={ask} disabled={!question.trim() || loading} t={t} />
                 </div>
               )}
             </div>
@@ -544,23 +583,26 @@ export default function Home() {
 
       <style>{`
         @keyframes fade{0%,100%{opacity:0.3}50%{opacity:1}}
-        input::placeholder,textarea::placeholder{color:#CBD5E1}
-        select:focus,input:focus,textarea:focus{border-color:#94A3B8!important;outline:none}
+        @keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+        .shimmer{background:linear-gradient(90deg,var(--shimmer1) 25%,var(--shimmer2) 50%,var(--shimmer1) 75%);background-size:800px 100%;animation:shimmer 1.5s ease-in-out infinite}
+        input::placeholder,textarea::placeholder{color:${t.textFaint}}
+        select:focus,input:focus,textarea:focus{border-color:${t.textMuted}!important;outline:none}
         *{box-sizing:border-box}
         ::-webkit-scrollbar{width:5px}
         ::-webkit-scrollbar-track{background:transparent}
-        ::-webkit-scrollbar-thumb{background:#E2E8F0;border-radius:99px}
+        ::-webkit-scrollbar-thumb{background:${t.border};border-radius:99px}
+        select option{background:${t.inputBg};color:${t.text}}
       `}</style>
     </div>
   );
 }
 
-function AskBtn({ onClick, disabled }) {
+function AskBtn({ onClick, disabled, t }) {
   return (
     <button onClick={onClick} disabled={disabled} style={{
-      background: disabled ? "#F1F5F9" : "#0F172A", color: disabled ? "#CBD5E1" : "#fff",
+      background: disabled ? t.btnDisabledBg : t.btnBg, color: disabled ? t.btnDisabledText : t.btnText,
       border: "none", borderRadius: 7, padding: "10px 20px", cursor: disabled ? "default" : "pointer",
-      fontSize: 13, fontWeight: 500, fontFamily: "Georgia, serif", transition: "all 0.15s",
+      fontSize: 13, fontWeight: 500, fontFamily: "Georgia, serif", transition: "all 0.2s",
       whiteSpace: "nowrap", flexShrink: 0,
     }}>
       Ask
